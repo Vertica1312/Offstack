@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offstack — VGC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a08; }
+    .os-wrap { font-family: 'DM Mono', monospace; background: #0a0a08; color: #e8e4d9; min-height: 100vh; max-width: 680px; margin: 0 auto; }
+    .os-hero { padding: 4rem 2rem 3rem; border-bottom: 0.5px solid rgba(232,228,217,0.12); position: relative; overflow: hidden; }
+    .os-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 320px; height: 320px; border-radius: 50%; border: 0.5px solid rgba(232,228,217,0.06); }
+    .os-hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 200px; height: 200px; border-radius: 50%; border: 0.5px solid rgba(232,228,217,0.08); }
+    .os-wordmark { font-size: 11px; font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(232,228,217,0.45); margin-bottom: 2.5rem; }
+    .os-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 8vw, 4.5rem); font-weight: 300; line-height: 1.05; color: #e8e4d9; margin-bottom: 1rem; max-width: 520px; }
+    .os-title em { font-style: italic; color: rgba(232,228,217,0.55); }
+    .os-tagline { font-size: 11px; font-weight: 300; letter-spacing: 0.15em; color: rgba(232,228,217,0.4); margin-bottom: 2.5rem; text-transform: uppercase; }
+    .os-event-strip { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem 0 0; }
+    .os-event-item { display: flex; flex-direction: column; gap: 2px; }
+    .os-event-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(232,228,217,0.3); }
+    .os-event-value { font-size: 13px; font-weight: 400; color: #e8e4d9; }
+    .os-body { padding: 3rem 2rem; }
+    .os-premise { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; line-height: 1.7; color: rgba(232,228,217,0.75); max-width: 540px; margin-bottom: 3rem; border-left: 0.5px solid rgba(232,228,217,0.15); padding-left: 1.5rem; }
+    .os-session-card { border: 0.5px solid rgba(232,228,217,0.12); padding: 1.75rem; margin-bottom: 3rem; }
+    .os-session-tag { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(232,228,217,0.3); margin-bottom: 1rem; }
+    .os-session-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; font-style: italic; line-height: 1.5; color: #e8e4d9; margin-bottom: 1rem; }
+    .os-session-desc { font-size: 11px; font-weight: 300; line-height: 1.8; color: rgba(232,228,217,0.45); }
+    .os-divider { height: 0.5px; background: rgba(232,228,217,0.08); margin: 2.5rem 0; }
+    .os-spend-note { font-size: 11px; font-weight: 300; color: rgba(232,228,217,0.4); line-height: 1.8; margin-bottom: 3rem; padding: 1.25rem; border: 0.5px solid rgba(232,228,217,0.08); }
+    .os-spend-note strong { color: rgba(232,228,217,0.7); font-weight: 400; }
+    .os-form-title { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(232,228,217,0.3); margin-bottom: 2rem; }
+    .os-field { margin-bottom: 1.5rem; }
+    .os-label { display: block; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,228,217,0.35); margin-bottom: 0.5rem; }
+    .os-input { width: 100%; background: transparent; border: none; border-bottom: 0.5px solid rgba(232,228,217,0.2); padding: 0.6rem 0; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 300; color: #e8e4d9; outline: none; transition: border-color 0.2s; }
+    .os-input:focus { border-bottom-color: rgba(232,228,217,0.6); }
+    .os-input::placeholder { color: rgba(232,228,217,0.18); }
+    .os-topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.5rem; }
+    .os-topic-option { position: relative; }
+    .os-topic-option input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .os-topic-label { display: block; padding: 0.75rem 1rem; border: 0.5px solid rgba(232,228,217,0.12); font-size: 10px; font-weight: 300; letter-spacing: 0.05em; color: rgba(232,228,217,0.45); cursor: pointer; transition: all 0.15s; line-height: 1.5; }
+    .os-topic-option input:checked + .os-topic-label { border-color: rgba(232,228,217,0.5); color: #e8e4d9; background: rgba(232,228,217,0.04); }
+    .os-topic-label:hover { border-color: rgba(232,228,217,0.25); color: rgba(232,228,217,0.65); }
+    .os-radio-group { display: flex; flex-direction: column; gap: 8px; margin-top: 0.5rem; }
+    .os-radio-option { position: relative; }
+    .os-radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .os-radio-label { display: block; padding: 0.65rem 1rem; border: 0.5px solid rgba(232,228,217,0.12); font-size: 10px; font-weight: 300; letter-spacing: 0.05em; color: rgba(232,228,217,0.45); cursor: pointer; transition: all 0.15s; }
+    .os-radio-option input:checked + .os-radio-label { border-color: rgba(232,228,217,0.5); color: #e8e4d9; background: rgba(232,228,217,0.04); }
+    .os-submit { width: 100%; margin-top: 2rem; padding: 1rem; background: #e8e4d9; color: #0a0a08; border: none; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+    .os-submit:hover { opacity: 0.85; }
+    .os-submit:active { opacity: 0.7; }
+    .os-soft-opt { margin-top: 2.5rem; padding-top: 2rem; border-top: 0.5px solid rgba(232,228,217,0.08); }
+    .os-soft-opt p { font-size: 11px; font-weight: 300; color: rgba(232,228,217,0.3); line-height: 1.8; margin-bottom: 1rem; }
+    .os-soft-input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .os-soft-input-row .os-input { flex: 1; }
+    .os-soft-btn { background: transparent; border: 0.5px solid rgba(232,228,217,0.2); padding: 0.6rem 1rem; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,228,217,0.4); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .os-soft-btn:hover { border-color: rgba(232,228,217,0.4); color: rgba(232,228,217,0.7); }
+    .os-footer { padding: 2rem; border-top: 0.5px solid rgba(232,228,217,0.08); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(232,228,217,0.2); }
+    .os-success { display: none; text-align: center; padding: 3rem 2rem; }
+    .os-success.visible { display: block; }
+    .os-success-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: #e8e4d9; margin-bottom: 1rem; }
+    .os-success-sub { font-size: 11px; font-weight: 300; color: rgba(232,228,217,0.4); line-height: 1.8; }
+  </style>
+</head>
+<body>
+<div class="os-wrap">
+  <div class="os-hero">
+    <div class="os-wordmark">Offstack</div>
+    <h1 class="os-title">Step away<br>from the work.<br><em>Step into the room.</em></h1>
+    <p class="os-tagline">A monthly gathering for tech people in VGC</p>
+    <div class="os-event-strip">
+      <div class="os-event-item">
+        <span class="os-event-label">Date</span>
+        <span class="os-event-value">Saturday, 3 May 2026</span>
+      </div>
+      <div class="os-event-item">
+        <span class="os-event-label">Time</span>
+        <span class="os-event-value">5:00 PM — 7:00 PM</span>
+      </div>
+      <div class="os-event-item">
+        <span class="os-event-label">Venue</span>
+        <span class="os-event-value">Tesh Café, VGC Park 1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="os-body" id="main-form-body">
+    <p class="os-premise">
+      You spend your days building things most people don't fully understand. You're brilliant, focused, and mostly invisible to the other brilliant, focused people living within minutes of you.<br><br>
+      Offstack is for that.
+    </p>
+
+    <div class="os-session-card">
+      <div class="os-session-tag">Session 01 — The Scenario</div>
+      <div class="os-session-title">"Nigeria, 100 years from now. We built everything we always said we would. What made it possible?"</div>
+      <p class="os-session-desc">You'll arrive as a specific character — a future Nigerian who lived through the turning point. The conversation will be immersive, imaginative, and unlike anything on your usual calendar.</p>
+    </div>
+
+    <div class="os-spend-note">
+      <strong>No ticket price.</strong> Attendance is free to register. At the event, you'll order a meal of your choice — we ask for a minimum spend of N5,000–N15,000 at the venue. Your evening, your appetite.
+    </div>
+
+    <div class="os-divider"></div>
+
+    <div class="os-form-section">
+      <div class="os-form-title">Secure your place</div>
+
+      <div class="os-field">
+        <label class="os-label" for="fname">Full name</label>
+        <input class="os-input" type="text" id="fname" placeholder="Your name">
+      </div>
+
+      <div class="os-field">
+        <label class="os-label" for="fwa">WhatsApp number</label>
+        <input class="os-input" type="tel" id="fwa" placeholder="+234">
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">Are you based in VGC?</label>
+        <div class="os-radio-group">
+          <div class="os-radio-option">
+            <input type="radio" name="location" id="loc-yes" value="yes">
+            <label class="os-radio-label" for="loc-yes">Yes, I live in VGC</label>
+          </div>
+          <div class="os-radio-option">
+            <input type="radio" name="location" id="loc-near" value="nearby">
+            <label class="os-radio-label" for="loc-near">Nearby — Lekki / Ajah / VGC axis</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">What do you do?</label>
+        <div class="os-radio-group">
+          <div class="os-radio-option">
+            <input type="radio" name="role" id="role-eng" value="engineer">
+            <label class="os-radio-label" for="role-eng">Engineer / developer</label>
+          </div>
+          <div class="os-radio-option">
+            <input type="radio" name="role" id="role-founder" value="founder">
+            <label class="os-radio-label" for="role-founder">Founder / co-founder</label>
+          </div>
+          <div class="os-radio-option">
+            <input type="radio" name="role" id="role-pm" value="pm">
+            <label class="os-radio-label" for="role-pm">Product / design / data</label>
+          </div>
+          <div class="os-radio-option">
+            <input type="radio" name="role" id="role-other" value="other">
+            <label class="os-radio-label" for="role-other">Other — tech adjacent</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">Topics you'd want to explore in future sessions (pick any)</label>
+        <div class="os-topic-grid">
+          <div class="os-topic-option">
+            <input type="checkbox" id="t1" name="topics" value="consciousness">
+            <label class="os-topic-label" for="t1">Consciousness &amp; what it means to be human</label>
+          </div>
+          <div class="os-topic-option">
+            <input type="checkbox" id="t2" name="topics" value="meaning">
+            <label class="os-topic-label" for="t2">Creativity, meaning &amp; the one life we have</label>
+          </div>
+          <div class="os-topic-option">
+            <input type="checkbox" id="t3" name="topics" value="civilisation">
+            <label class="os-topic-label" for="t3">Civilisation — where we're headed</label>
+          </div>
+          <div class="os-topic-option">
+            <input type="checkbox" id="t4" name="topics" value="power">
+            <label class="os-topic-label" for="t4">Power, systems &amp; how the world actually works</label>
+          </div>
+          <div class="os-topic-option">
+            <input type="checkbox" id="t5" name="topics" value="acceleration">
+            <label class="os-topic-label" for="t5">What truly matters in a world that keeps accelerating</label>
+          </div>
+          <div class="os-topic-option">
+            <input type="checkbox" id="t6" name="topics" value="africa">
+            <label class="os-topic-label" for="t6">Africa's role in the next century</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="os-submit" onclick="handleSubmit()">Register for session 01</button>
+    </div>
+
+    <div class="os-soft-opt">
+      <p>Can't make 3 May but want to be kept posted? Leave your number and we'll reach out before the next one.</p>
+      <div class="os-soft-input-row">
+        <input class="os-input" type="tel" id="soft-wa" placeholder="+234 — WhatsApp number">
+        <button class="os-soft-btn" onclick="handleSoftSignup()">Keep me posted</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="os-success" id="success-state">
+    <div class="os-success-title">You're in the room.</div>
+    <p class="os-success-sub">We'll be in touch on WhatsApp with everything you need ahead of 3 May.<br><br>Come ready to think differently.</p>
+  </div>
+
+  <div class="os-footer">
+    Offstack &mdash; VGC, Lagos &mdash; Monthly
+  </div>
+</div>
+
+<script>
+function handleSubmit() {
+  const name = document.getElementById('fname').value.trim();
+  const wa = document.getElementById('fwa').value.trim();
+  const loc = document.querySelector('input[name="location"]:checked');
+  if (!name || !wa || !loc) {
+    const missing = [];
+    if (!name) missing.push('name');
+    if (!wa) missing.push('WhatsApp number');
+    if (!loc) missing.push('location');
+    alert('Please fill in: ' + missing.join(', '));
+    return;
+  }
+  document.getElementById('main-form-body').style.display = 'none';
+  document.getElementById('success-state').classList.add('visible');
+}
+function handleSoftSignup() {
+  const wa = document.getElementById('soft-wa').value.trim();
+  if (!wa) { alert('Please enter your WhatsApp number'); return; }
+  const btn = document.querySelector('.os-soft-btn');
+  btn.textContent = 'Noted';
+  btn.style.borderColor = 'rgba(232,228,217,0.5)';
+  btn.style.color = 'rgba(232,228,217,0.7)';
+  btn.disabled = true;
+}
+</script>
+</body>
+</html>
